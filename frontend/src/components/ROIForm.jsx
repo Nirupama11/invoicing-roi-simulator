@@ -1,74 +1,67 @@
 import React, { useState } from "react";
+import axios from "axios";
 
-function ROIForm() {
+const ROIForm = () => {
   const [formData, setFormData] = useState({
-    invoicesPerMonth: "",
-    costPerInvoice: "",
-    automationCost: "",
+    investment: "",
+    revenue: "",
+    savings: "",
   });
+
+  const [response, setResponse] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form data:", formData);
+
+    try {
+      const res = await axios.post("http://localhost:5000/api/roi", formData);
+      setResponse(res.data.message);
+    } catch (error) {
+      console.error("Error:", error);
+      setResponse("Error sending data!");
+    }
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white shadow-md rounded-lg p-6 w-full max-w-md"
-    >
-      <h2 className="text-xl font-semibold mb-4 text-gray-700">
-        Enter your details
-      </h2>
-
-      <label className="block mb-2">
-        Invoices per Month:
+    <div className="text-white p-6 bg-gray-800 rounded-lg shadow-lg max-w-md mx-auto">
+      <h2 className="text-xl font-bold mb-4">ROI Simulator</h2>
+      <form onSubmit={handleSubmit} className="space-y-3">
         <input
           type="number"
-          name="invoicesPerMonth"
-          value={formData.invoicesPerMonth}
+          name="investment"
+          placeholder="Investment"
           onChange={handleChange}
-          className="mt-1 w-full border p-2 rounded"
-          required
+          className="w-full p-2 bg-gray-700 rounded"
         />
-      </label>
-
-      <label className="block mb-2">
-        Cost per Invoice (₹):
         <input
           type="number"
-          name="costPerInvoice"
-          value={formData.costPerInvoice}
+          name="revenue"
+          placeholder="Revenue"
           onChange={handleChange}
-          className="mt-1 w-full border p-2 rounded"
-          required
+          className="w-full p-2 bg-gray-700 rounded"
         />
-      </label>
-
-      <label className="block mb-2">
-        Monthly Automation Cost (₹):
         <input
           type="number"
-          name="automationCost"
-          value={formData.automationCost}
+          name="savings"
+          placeholder="Savings"
           onChange={handleChange}
-          className="mt-1 w-full border p-2 rounded"
-          required
+          className="w-full p-2 bg-gray-700 rounded"
         />
-      </label>
+        <button
+          type="submit"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded w-full"
+        >
+          Submit
+        </button>
+      </form>
 
-      <button
-        type="submit"
-        className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        Calculate ROI
-      </button>
-    </form>
+      {response && <p className="mt-4 text-green-400">{response}</p>}
+    </div>
   );
-}
+};
 
 export default ROIForm;
